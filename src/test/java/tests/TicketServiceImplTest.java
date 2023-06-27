@@ -48,8 +48,8 @@ public class TicketServiceImplTest {
         // Verify interactions with the paymentService and reservationService
         // 50 payment 2 * 20 + 1 * 10
         // 3 seats 2 + 1
-        verify(paymentService, times(1)).makePayment(accountId, 50); // 2 adult tickets * £20
-        verify(reservationService, times(1)).reserveSeat(accountId, 3); // 1 child ticket requires a seat
+        verify(paymentService, times(1)).makePayment(accountId, 50);
+        verify(reservationService, times(1)).reserveSeat(accountId, 3);
     }
 
     @Test(expected = InvalidPurchaseException.class)
