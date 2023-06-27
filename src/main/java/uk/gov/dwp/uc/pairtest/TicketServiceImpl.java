@@ -62,28 +62,35 @@ public class TicketServiceImpl implements TicketService {
         for (TicketTypeRequest request : ticketTypeRequests){
             validateTicket(request);
 
+            // Update totals
             totalTickets += request.getNoOfTickets();
+            totalCost += request.getTotal();
+
+            // Throw if max tickets exceeded
             if(totalTickets > MAX_TICKETS){
                 throw new InvalidPurchaseException();
             }
 
+            // Add seats if required
             if(isSeatsRequired(request.getTicketType())){
                 totalSeats+= request.getNoOfTickets();
             }
 
+            // Update totalAdults or minRequiredAdults for
+            // future check to ensure there is a sufficient adults : none adults ratio
             if(request.getTicketType() == TicketType.ADULT){
                 totalAdults+= request.getNoOfTickets();
             } else{
                 minRequiredAdults+= request.getNoOfTickets();
             }
-
-            totalCost += request.getTotal();
         }
 
+        // Throw if there are less adults than children and infants
         if(totalAdults < minRequiredAdults){
             throw new InvalidPurchaseException();
         }
 
+        // Reserve seats and make payment
         reservationService.reserveSeat(accountId, totalSeats);
         paymentService.makePayment(accountId, totalCost);
     }
