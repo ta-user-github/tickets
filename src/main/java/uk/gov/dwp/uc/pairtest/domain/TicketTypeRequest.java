@@ -21,7 +21,7 @@ public final class TicketTypeRequest {
         return type;
     }
 
-    public enum Type {
-        ADULT, CHILD , INFANT
+    public double getTotal(){
+        return this.type.getPrice() * this.noOfTickets;
     }
 }

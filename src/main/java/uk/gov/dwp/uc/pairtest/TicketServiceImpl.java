@@ -49,7 +49,42 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void purchaseTickets(Long accountId, TicketTypeRequest... ticketTypeRequests) throws InvalidPurchaseException {
+        validateAccountId(accountId);
+        validatePurchase(ticketTypeRequests);
 
+        int totalAdults = 0;
+        int minRequiredAdults = 0;
+
+        int totalTickets = 0;
+        int totalSeats = 0;
+        int totalCost = 0;
+
+        for (TicketTypeRequest request : ticketTypeRequests){
+            validateTicket(request);
+
+            totalTickets += request.getNoOfTickets();
+            if(totalTickets > MAX_TICKETS){
+                throw new InvalidPurchaseException();
+            }
+
+            if(isSeatsRequired(request.getTicketType())){
+                totalSeats+= request.getNoOfTickets();
+            }
+
+            if(request.getTicketType() == TicketType.ADULT){
+                totalAdults+= request.getNoOfTickets();
+            } else{
+                minRequiredAdults+= request.getNoOfTickets();
+            }
+
+            totalCost += request.getTotal();
+        }
+
+        if(totalAdults < minRequiredAdults){
+            throw new InvalidPurchaseException();
+        }
+
+        reservationService.reserveSeat(accountId, totalSeats);
+        paymentService.makePayment(accountId, totalCost);
     }
-
 }
